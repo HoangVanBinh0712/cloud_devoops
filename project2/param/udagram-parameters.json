@@ -5,10 +5,14 @@
   },
   {
     "ParameterKey": "DesiredCapacity",
-    "ParameterValue": "2"
+    "ParameterValue": "4"
   },
   {
     "ParameterKey": "S3BucketName",
     "ParameterValue": "binh-udatcity-project-1"
+  },
+  {
+    "ParameterKey": "KeyName",
+    "ParameterValue": "udacity_ssh"
   }
 ]

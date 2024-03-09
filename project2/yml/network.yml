@@ -1,6 +1,6 @@
 Description: >
   Carlos Rivas / Udacity
-  This template deploys a VPC.
+  This template deploys a Network infrastructure.
 Parameters:
   EnvironmentName:
     Description: An environment name that will be prefixed to resources.

@@ -1,3 +1,6 @@
+Description: >
+  Carlos Rivas / Udacity
+  This template deploys a server's resources.
 Parameters:
   EnvironmentName:
     Description: An environment name that will be prefixed to resources.
@@ -9,6 +12,10 @@ Parameters:
 
   S3BucketName:
     Description: Name of the bucket
+    Type: String
+
+  KeyName:
+    Description: Name of the key pair
     Type: String
 
 Resources:
@@ -36,6 +43,10 @@ Resources:
           FromPort: 80
           ToPort: 80
           SourceSecurityGroupId: !Ref LBSecGroup
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          SourceSecurityGroupId: !Ref BastionSecurityGroup
       SecurityGroupEgress:
         - IpProtocol: tcp
           FromPort: 0
@@ -47,6 +58,7 @@ Resources:
     Properties:
       LaunchTemplateName: !Sub "${EnvironmentName}-web-servers"
       LaunchTemplateData:
+        KeyName: !Ref KeyName
         UserData:
           Fn::Base64: |
             #!/bin/bash
@@ -67,7 +79,7 @@ Resources:
             </html> 
             EOF
 
-            # Reload Nginx to apply changes 
+            # Reload Nginx to apply changes
             sudo systemctl restart nginx
         ImageId: ami-07d9b9ddc6cd8dd30
         SecurityGroupIds:
@@ -82,7 +94,6 @@ Resources:
   S3Bucket:
     Type: AWS::S3::Bucket
     Properties:
-      AccessControl: Private
       BucketName: !Sub "${S3BucketName}"
       VersioningConfiguration:
         Status: Enabled
@@ -91,10 +102,21 @@ Resources:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
       PublicAccessBlockConfiguration:
-        BlockPublicAcls: True
-        IgnorePublicAcls: True
-        BlockPublicPolicy: True
-        RestrictPublicBuckets: True
+        BlockPublicAcls: False
+        IgnorePublicAcls: False
+        BlockPublicPolicy: False
+        RestrictPublicBuckets: False
+  MyBucketPolicy:
+    Type: 'AWS::S3::BucketPolicy'
+    Properties:
+      Bucket: !Ref S3Bucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: '*'
+            Action: 's3:GetObject'
+            Resource: !Sub "arn:aws:s3:::${S3Bucket}/*"
   WebServerInstanceRole:
     Type: AWS::IAM::Role
     Properties:
@@ -118,8 +140,11 @@ Resources:
                   - 's3:GetObject*'
                   - 's3:PutObject*'
                   - 's3:DeleteObject*'
+                  - 's3:ListBucket*'
                 Resource:
-                  - - !GetAtt S3Bucket.Arn
+                  - !GetAtt S3Bucket.Arn
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
   WebServerInstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
@@ -135,9 +160,9 @@ Resources:
       LaunchTemplate:
         LaunchTemplateId: !Ref WebAppLaunchTemplate
         Version: !GetAtt WebAppLaunchTemplate.LatestVersionNumber
-      MinSize: '2'
+      MinSize: '4'
       DesiredCapacity: !Ref DesiredCapacity
-      MaxSize: '2'
+      MaxSize: '4'
       TargetGroupARNs:
         - Ref: WebAppTargetGroup
 
@@ -185,3 +210,52 @@ Resources:
           Values: [/]
       ListenerArn: !Ref 'Listener'
       Priority: 1
+  # EC 2 server as a bastion host
+  Bastion:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      KeyName: !Ref KeyName
+      ImageId: ami-07d9b9ddc6cd8dd30
+
+      SecurityGroupIds:
+        - !Ref BastionSecurityGroup
+
+      SubnetId:
+        Fn::ImportValue: !Sub "${EnvironmentName}-public-subnet2"
+      Tags:
+        - Key: Name
+          Value: "Bastion Host"
+
+  # The Security Group of the Bastion Host
+  BastionSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow public SSH access to the bastion host
+      VpcId:
+        Fn::ImportValue:
+          !Sub "${EnvironmentName}-vpc-id"
+      SecurityGroupIngress:
+        # Allow SSH access to the bastion host
+        # Ideally, set the ip address of your local computer. In this case, though,
+        # let's just allow any ip address.
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+  MyCloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Origins:
+          - DomainName: !GetAtt WebAppLB.DNSName
+            Id: MyLoadBalancerOrigin
+            CustomOriginConfig:
+              HTTPPort: 80
+              OriginProtocolPolicy: http-only
+        DefaultCacheBehavior:
+          TargetOriginId: MyLoadBalancerOrigin
+          ForwardedValues:
+            QueryString: true
+          ViewerProtocolPolicy: allow-all
+        Enabled: true

@@ -21,10 +21,16 @@ aws cloudformation delete-stack --stack-name ssm --region us-east-1 --profile ad
 aws ssm start-session --target id --region us-east-1 --profile admin
 
 
-aws cloudformation create-stack --stack-name network --template-body file://yml/network-config.yml --parameters file://param/network-config.json --region us-east-1 --profile admin
-aws cloudformation update-stack --stack-name network --template-body file://yml/network-config.yml --parameters file://param/network-config.json --region us-east-1 --profile admin
+aws cloudformation create-stack --stack-name network --template-body file://yml/network.yml --parameters file://param/network-parameters.json --region us-east-1 --profile admin
+aws cloudformation update-stack --stack-name network --template-body file://yml/network.yml --parameters file://param/network-parameters.json --region us-east-1 --profile admin
 aws cloudformation delete-stack --stack-name network --region us-east-1 --profile admin
 
-aws cloudformation create-stack --stack-name server --template-body file://yml/server-config.yml --parameters file://param/server-config.json --capabilities CAPABILITY_NAMED_IAM --region us-east-1 --profile admin
-aws cloudformation update-stack --stack-name server --template-body file://yml/server-config.yml --parameters file://param/server-config.json --capabilities CAPABILITY_NAMED_IAM --region us-east-1 --profile admin
+aws cloudformation create-stack --stack-name server --template-body file://yml/server.yml --parameters file://param/server-parameters.json --capabilities CAPABILITY_NAMED_IAM --region us-east-1 --profile admin
+aws cloudformation update-stack --stack-name server --template-body file://yml/server.yml --parameters file://param/server-parameters.json --capabilities CAPABILITY_NAMED_IAM --region us-east-1 --profile admin
 aws cloudformation delete-stack --stack-name server --region us-east-1 --profile admin
+
+./run.sh deploy us-east-1 network-stack yml/network.yml param/network-parameters.json
+./run.sh deploy us-east-1 udagram-stack yml/udagram.yml param/udagram-parameters.json
+
+./run.sh delete us-east-1 network-stack
+./run.sh delete us-east-1 udagram-stack
