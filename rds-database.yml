@@ -1,0 +1,67 @@
+Parameters:
+    EnvironmentName:
+          Description: An environment name that will be prefixed to resources.
+          Type: String
+      
+    ProjectName:
+          Description: An name that will be prefixed to resources.
+          Type: String
+
+    RdsMasterUsername:
+          Description: RDS Username
+          Type: String
+
+    RdsMasterPassword:
+          Description: RDS Password
+          Type: String
+Resources:
+  DBSercurityGroup:
+      Type: AWS::EC2::SecurityGroup
+      Properties:
+          GroupName: !Ref EnvironmentName
+          GroupDescription: DB security group for rds
+          VpcId:
+          Fn::ImportValue:
+              !Sub "${EnvironmentName}-vpc-id"
+          SecurityGroupIngress:
+          - IpProtocol: tcp
+            FromPort: 3306
+            ToPort: 3306
+            CidrIp: 10.10.0.0/24
+  DBSubnetGroup:
+      Type: 'AWS::RDS::DBSubnetGroup'
+      Properties:
+          DBSubnetGroupName: !Ref EnvironmentName
+          DBSubnetGroupDescription: DB Subnet Group
+          SubnetIds: !Split
+          - ","
+          - Fn::ImportValue:
+              !Sub "${EnvironmentName}-private-subnets"
+  DBParameterGroup:
+      Type: AWS::RDS::DBParameterGroup
+      Properties:
+          DBParameterGroupName: !Ref EnvironmentName
+          Description: Custom parameter group for rds example
+          Family: mysql8.0
+          Parameters:
+              innodb_buffer_pool_instances: 1
+              innodb_buffer_pool_size: 134217728
+              max_connections: 1000
+  DBInstance:
+      Type: AWS::RDS::DBInstance
+      DeletionPolicy: Snapshot
+      Properties:
+          AllocatedStorage: '20'
+          DBInstanceClass: db.t3.micro
+          AllowMajorVersionUpgrade: false
+          AutoMinorVersionUpgrade: true
+          DBInstanceIdentifier: !Ref EnvironmentName
+          DBName: exampledb
+          DBParameterGroupName: !Ref DBParameterGroup
+          DBSubnetGroupName: !Ref DBSubnetGroup
+          Engine: mysql
+          EngineVersion: "8.0.32"
+          MasterUsername: !Ref RdsMasterUsername
+          MasterUserPassword: !Ref RdsMasterPassword
+          VPCSecurityGroups:
+            - !Ref DBSercurityGroup

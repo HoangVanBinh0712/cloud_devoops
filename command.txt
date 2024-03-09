@@ -1,0 +1,14 @@
+# Move A file to bastion host
+scp udacity_ssh.pem ubuntu@id:~/
+# Remove permission
+chmod 600 udacity_ssh.pem
+# Add file to ssh agent
+ssh-add D:\udacity\udacity_ssh.pem
+# Use SSH agent forwarding
+ssh -A -i ./udacity_ssh.pem ubuntu@id
+# Use in Bastion host to check file forwarded
+ssh-add -l
+
+
+
+ssh -i udacity_ssh.pem ubuntu@id

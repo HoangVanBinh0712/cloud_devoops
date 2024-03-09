@@ -1,0 +1,14 @@
+[
+  {
+    "ParameterKey": "EnvironmentName",
+    "ParameterValue": "udacityproject"
+  },
+  {
+    "ParameterKey": "ProjectName",
+    "ParameterValue": "udacityproject"
+  },
+  {
+    "ParameterKey": "KeyName",
+    "ParameterValue": "udacity_ssh"
+  }
+]

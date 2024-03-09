@@ -1,0 +1,14 @@
+[
+  {
+    "ParameterKey": "EnvironmentName",
+    "ParameterValue": "UdacityProject"
+  },
+  {
+    "ParameterKey": "ProjectName",
+    "ParameterValue": "UdacityProject"
+  },
+  {
+    "ParameterKey": "DisiredCompacity",
+    "ParameterValue": "1"
+  }
+]

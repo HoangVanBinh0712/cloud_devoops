@@ -1,0 +1,30 @@
+aws cloudformation create-stack --stack-name init-resource --template-body file://ourinfra.yml --parameters file://ourinfra-params.json --region us-east-1 --profile binh
+aws cloudformation update-stack --stack-name init-resource --template-body file://ourinfra.yml --parameters file://ourinfra-params.json --region us-east-1 --profile binh
+aws cloudformation delete-stack --stack-name init-resource --region us-east-1 --profile binh
+
+aws cloudformation create-stack --stack-name launch-instance --template-body file://launch-instance.yml --parameters file://launch-instance-params.json --capabilities CAPABILITY_NAMED_IAM --region us-east-1 --profile binh
+aws cloudformation delete-stack --stack-name launch-instance --region us-east-1 --profile binh
+
+
+aws cloudformation create-stack --stack-name s3 --template-body file://s3.yml --parameters file://s3-params.json --capabilities CAPABILITY_NAMED_IAM --region us-east-1 --profile binh
+aws cloudformation update-stack --stack-name s3 --template-body file://s3.yml --parameters file://s3-params.json --capabilities CAPABILITY_NAMED_IAM --region us-east-1 --profile binh
+
+aws cloudformation delete-stack --stack-name s3 --region us-east-1 --profile binh
+aws ssm start-session --target id --region us-east-1 --profile binh
+### ADMIN
+
+
+
+aws cloudformation create-stack --stack-name ssm --template-body file://ssm.yml --parameters file://ssm-params.json --capabilities CAPABILITY_NAMED_IAM --region us-east-1 --profile admin
+aws cloudformation delete-stack --stack-name ssm --region us-east-1 --profile admin
+
+aws ssm start-session --target id --region us-east-1 --profile admin
+
+
+aws cloudformation create-stack --stack-name network --template-body file://yml/network-config.yml --parameters file://param/network-config.json --region us-east-1 --profile admin
+aws cloudformation update-stack --stack-name network --template-body file://yml/network-config.yml --parameters file://param/network-config.json --region us-east-1 --profile admin
+aws cloudformation delete-stack --stack-name network --region us-east-1 --profile admin
+
+aws cloudformation create-stack --stack-name server --template-body file://yml/server-config.yml --parameters file://param/server-config.json --capabilities CAPABILITY_NAMED_IAM --region us-east-1 --profile admin
+aws cloudformation update-stack --stack-name server --template-body file://yml/server-config.yml --parameters file://param/server-config.json --capabilities CAPABILITY_NAMED_IAM --region us-east-1 --profile admin
+aws cloudformation delete-stack --stack-name server --region us-east-1 --profile admin

@@ -1,0 +1,18 @@
+[
+  {
+    "ParameterKey": "EnvironmentName",
+    "ParameterValue": "UdacityProject"
+  },
+  {
+    "ParameterKey": "ProjectName",
+    "ParameterValue": "UdacityProject"
+  },
+  {
+    "ParameterKey": "RdsMasterUsername",
+    "ParameterValue": "RdsMasterUsername"
+  },
+  {
+    "ParameterKey": "RdsMasterPassword",
+    "ParameterValue": "RdsMasterPassword"
+  }
+]

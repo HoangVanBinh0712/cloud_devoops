@@ -1,1 +1,3 @@
-/udacity_ssh.pem
+*.pem
+
+udacity_accessKeys.csv
