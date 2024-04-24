@@ -1,0 +1,17 @@
+Repository: https://github.com/HoangVanBinh0712/cicd
+Before you can run my project you have to run the terraform to create resources. Then copy the backend registry url, frontend registry url and
+update it for image in deployment.yaml of each repository.
+Here are the secrets store in github Repository secrets
+	+ AWS_ACCESS_KEY_ID - aws access key id
+	+ AWS_REGION - aws region (us-east-1)
+	+ AWS_SECRET_ACCESS_KEY - aws access key
+	+ AWS_SESSION_TOKEN - aws session token
+	+ AWS_REGISTRY_URL_FE - frontend registry url
+	+ AWS_REGISTRY_URL_BE - backend registry url
+	+ CLUSTER_NAME - cluster name
+	+ REACT_APP_MOVIE_API_URL - Url of the DNS name of load balancer of backend.
+Flow: 
+	1. Create the pull_request then merge in the cicd-backend folder.
+	2. Get the dns name of the load balancer of backend.
+	3. Patse that value to the github secret "REACT_APP_MOVIE_API_URL"
+	4. Create the pull_request then merge in the cicd-frontend folder.

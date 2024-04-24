@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: analytic-map-1
+data:
+  # property-like keys; each key maps to a simple value
+  DB_NAME: "mydatabase"
+  DB_PORT: "5432"
+  DB_HOST: "postgresql-service"
+  DB_USERNAME: "myuser"

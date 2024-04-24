@@ -1,0 +1,46 @@
+Commands:
+	kubectl get(delete) pods(svc,deployment)
+	kubectl apply -f analytics-deployment.yaml
+	kubectl describe pods/pod-name(same with service, deployment)
+Agent cloudwatch:
+	https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Container-Insights-setup-metrics.html
+	https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Container-Insights-setup-logs.html
+	kubectl create configmap cluster-info --from-literal=cluster.name=demo --from-literal=logs.region=us-east-1 -n amazon-cloudwatch
+
+Apply:
+	Config:
+		kubectl apply -f pv.yaml
+		kubectl apply -f pvc.yaml
+	Service:
+		helm create postgresql
+			-> Then make the template(service,deployment,Values) same with kubenetes
+		helm install(uninstall,upgrade) postgresql ./postgresql1
+		(check pods for postgresql is running)
+		(forward then insert data)
+		kubectl port-forward service/postgresql-service 5433:5432
+		Get-Content 1_create_tables.sql | psql --host 127.0.0.1 -U myuser -d mydatabase -p 5433
+		Get-Content 2_seed_users.sql | psql --host 127.0.0.1 -U myuser -d mydatabase -p 5433
+		Get-Content 3_seed_tokens.sql | psql --host 127.0.0.1 -U myuser -d mydatabase -p 5433
+		
+		(Run application)
+		kubectl apply -f analytics-deployment.yaml
+		kubectl apply -f analytics-service.yaml
+	IAM: 
+		node-group-role:
+			{
+				"Version": "2012-10-17",
+				"Statement": [
+					{
+						"Sid": "VisualEditor0",
+						"Effect": "Allow",
+						"Action": [
+							"logs:PutLogEvents",
+							"logs:CreateLogStream",
+							"logs:CreateLogGroup",
+							"logs:DescribeLogGroups",
+							"logs:DescribeLogStreams"
+						],
+						"Resource": "arn:aws:logs:*:151465357300:log-group:*:log-stream:*"
+					}
+				]
+			}

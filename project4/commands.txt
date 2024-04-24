@@ -1,0 +1,6 @@
+aws eks update-kubeconfig --name cluster
+kubectl set env deployment/registry STORAGE_DIR=/local
+export STORAGE_DIR=/local_storage
+
+terraform destroy	
+terraform apply

@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: example
+  labels:
+    name: example
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: example
+  template:
+    metadata:
+      labels:
+        service: example
+    spec:
+      containers:
+        - name: example
+          image: isjustintime/cd12355-user-api:0.1.0
+          imagePullPolicy: Always
+          livenessProbe:
+            httpGet:
+              path: /health_check
+              port: 5125
+            initialDelaySeconds: 5
+            timeoutSeconds: 2
+          readinessProbe:
+            httpGet:
+              path: "/readiness_check"
+              port: 5125
+            initialDelaySeconds: 5
+            timeoutSeconds: 5
+          env:
+            - name: VAR_KEY
+              value: VAR_VAL
+      restartPolicy: Always

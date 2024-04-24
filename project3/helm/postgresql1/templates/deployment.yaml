@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "postgresql1.fullname" . }}
+  labels:
+    {{- include "postgresql1.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "postgresql1.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "postgresql1.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        app: {{- include "postgresql1.selectorLabels" . | nindent 6 }}
+        {{- end }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          env:
+            - name: POSTGRES_DB
+              value: {{ .Values.postgresDatabase }}
+            - name: POSTGRES_USER
+              value: {{ .Values.postgresUser }}
+            - name: POSTGRES_PASSWORD
+              value: {{ .Values.postgresPassword }}
+          ports:
+            - containerPort: {{ .Values.service.port }}

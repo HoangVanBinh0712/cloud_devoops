@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="$PROJECT_DIR$/.." vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/cd12355-microservices-aws-kubernetes-project-starter-main/analytics" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/demo-codebuild" vcs="Git" />
+  </component>
+</project>
